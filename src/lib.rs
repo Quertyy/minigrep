@@ -21,6 +21,40 @@ impl Config {
 pub fn run(config: Config) -> Result<(), Box<dyn Error>>{
     let contenu = fs::read_to_string(config.file)?;
 
-    println!("In the text :\n{}", contenu);
+    for ligne in rechercher(&config.recherche, &contenu) {
+        println!("{}", ligne);
+    }
+    
     Ok(())
+}
+
+pub fn rechercher<'a>(recherche: &str, contenu: &'a str) -> Vec<&'a str> {
+    let mut resultat = Vec::new();
+
+
+    for ligne in contenu.lines() {
+        if ligne.contains(recherche) {
+            resultat.push(ligne);
+        }
+    } 
+    resultat
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn un_resultat() {
+        let recherche = "duct";
+        let contenu = "\
+Rust:
+sécurité, rapidité, productivité.
+Obtenez les trois en même temps.";
+
+        assert_eq!(
+            vec!["sécurité, rapidité, productivité."],
+            rechercher(recherche, contenu)
+        );
+    }
 }
